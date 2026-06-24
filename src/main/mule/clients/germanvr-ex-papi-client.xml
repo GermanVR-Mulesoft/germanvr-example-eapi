@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="germanvr-papi-client"
+		doc:id="a22bf52f-5712-49f8-91c3-ae84e11fc29e">
+		<http:request doc:name="Request to PAPI"
+			doc:id="b1cc5935-7729-46f0-92d6-2fea599caec3"
+			config-ref="HTTP_Request_config_PAPI" path="/papi">
+			<http:query-params><![CDATA[#[output application/java
+---
+{
+	"status" : vars.status
+}]]]></http:query-params>
+		</http:request>
+	</sub-flow>
+</mule>

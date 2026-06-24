@@ -1,0 +1,21 @@
+# GLOBAL ERROR HANDLER LIB CONFIGURATION
+app:
+  namespace:
+    current: GERMANVR-EX-EAPI
+    
+  metadata:
+    showApplication: "true"
+    showErrorChain: "true"
+    showDetails: "true"
+    
+# RESILIENT REQUEST LIB CONFIGURATION
+request:
+    logs:
+        verbose: "false"
+        requestPayload: "false"
+        responsePayload: "false"
+        payloadMaxLength: "5000"
+
+    retryIdentifiers: "TIMEOUT,CONNECTIVITY,SERVICE_UNAVAILABLE,BAD_GATEWAY,GATEWAY_TIMEOUT"
+
+    

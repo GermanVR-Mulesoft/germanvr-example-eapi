@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_EAPI"
+		doc:name="HTTP Listener config"
+		doc:id="27b2a60b-5c4a-4ec9-ad30-c2df54ec82ef">
+		<http:listener-connection host="0.0.0.0"
+			port="8086" readTimeout="60000">
+			<reconnection>
+				<reconnect />
+			</reconnection>
+		</http:listener-connection>
+	</http:listener-config>
+	<flow name="germanvr-example-eapi-main"
+		doc:id="48dfb5db-49a7-4931-92f3-2f2ea5ef4030">
+		<http:listener doc:name="Listener"
+			doc:id="d585d3fe-c617-46ce-bb2d-4af82198f9d6" path="/eapi"
+			config-ref="HTTP_EAPI">
+			<http:response
+				statusCode="#[vars.httpStatus default 200]">
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:response>
+			<http:error-response
+				statusCode="#[vars.httpStatus default 500]">
+				<http:body><![CDATA[#[payload]]]></http:body>
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:error-response>
+		</http:listener>
+		<logger level="INFO" doc:name="Start Eapi"
+			doc:id="21f72316-3ec2-4641-80ab-6131362ede71" message="Start Eapi" />
+		<set-variable
+			value="#[attributes.queryParams.status default 200]"
+			doc:name="status QueryParam"
+			doc:id="3cf56584-ac4f-461b-a562-86076e743c8a" variableName="status" />
+		<!-- [STUDIO:"errorConfig"]<ee:transform doc:name="errorConfig"
+			doc:id="bcd50a12-a672-4263-8fdd-ca6f7eb3d544">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="errorConfig"><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+	httpStatus: 500,
+	identifier: "ERR_1003",
+	description: "Error al procesar la solicitud",
+	details: "Su solicitud no puedo ser atendida en este momento"
+}&#93;&#93;></ee:set-variable>
+			</ee:variables>
+		</ee:transform> [STUDIO] -->
+		<ee:transform doc:name="requestConfig"
+			doc:id="7ddbdb2d-d86f-4052-a4f0-f53e1380ccf8">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="requestConfig"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	flowName: "germanvr-papi-client"
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="dynamic-method-client"
+			doc:id="d47b4f11-9d0d-4b9a-b7a1-de6fd7978231"
+			name="dynamic-manage-request" />
+		<logger level="INFO" doc:name="End Eapi"
+			doc:id="72e0532f-61b0-408c-9634-a222c73d3385" message="End Eapi" />
+	</flow>
+</mule>
